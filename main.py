@@ -8,7 +8,7 @@ from pathlib import Path
 from datetime import datetime
 from dataclasses import dataclass, asdict
 
-from PySide6.QtCore import Qt, QThread, Signal
+from PySide6.QtCore import Qt, QThread, Signal, QStandardPaths
 from PySide6.QtGui import QFont, QColor
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
@@ -149,8 +149,10 @@ class DebadgerWindow(QMainWindow):
         self.output_dir = ""
         self.records = []
         self.worker = None
-        self.config_path = Path(__file__).with_name("config.json")
+        config_root = Path(QStandardPaths.writableLocation(QStandardPaths.StandardLocation.AppConfigLocation))
+        self.config_path = config_root / "config.json"
         try:
+            self.config_path.parent.mkdir(parents=True, exist_ok=True)
             self.config = json.loads(self.config_path.read_text(encoding="utf-8"))
         except Exception:
             self.config = {}
